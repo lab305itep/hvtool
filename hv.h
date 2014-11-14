@@ -53,6 +53,9 @@ public:
     QDoubleSpinBox *bxHVRead;
     QDoubleSpinBox *bxHVWrite;
     QDoubleSpinBox *bxIRead;    
+    QDoubleSpinBox *bx1Wire;
+    QDoubleSpinBox *bxCPUTemp;
+    QDoubleSpinBox *bxDACTemp;
     QPushButton    *bnOn[15];
     QDoubleSpinBox *bxRead[15];
     QDoubleSpinBox *bxWrite[15];

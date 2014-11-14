@@ -64,28 +64,23 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
 
     QVBoxLayout *vL = new QVBoxLayout(topframe);
     vL->setObjectName("verticalLayout");
-//      Preamp power ON    
+//      Preamp power and HV base
     hL = new QHBoxLayout();
     hL->setObjectName("hL_PreampPower");
     lb = new QLabel(topframe);
     lb->setObjectName("lb_PreampPower");
     lb->setText("Preamplifire power");
     hL->addWidget(lb);
-    hL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
     bnLV = new QPushButton(topframe);
     bnLV->setObjectName("bnLV");
     bnLV->setCheckable(true);
     bnLV->setText("On");
     hL->addWidget(bnLV);
-    vL->addLayout(hL);
-//      HV base power
-    hL = new QHBoxLayout();
-    hL->setObjectName("hL_HVPower");
+    hL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
     lb = new QLabel(topframe);
     lb->setObjectName("lb_HVPower");
     lb->setText("Base HV");
     hL->addWidget(lb);
-    hL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
     bxHVWrite = new QDoubleSpinBox(topframe);
     bxHVWrite->setObjectName("bxHVWrite");
     bxHVWrite->setMinimum(10);
@@ -125,6 +120,53 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
     bxIRead->setSuffix(" uA");
     hL->addWidget(bxIRead);
     vL->addLayout(hL);
+//	Temperatures
+    hL = new QHBoxLayout();
+    hL->setObjectName("hL_Temperature");
+    lb = new QLabel(topframe);
+    lb->setObjectName("lb_1WireTemp");
+    lb->setText("Temperature");
+    hL->addWidget(lb);
+    hL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
+    lb = new QLabel(topframe);
+    lb->setObjectName("lb_1Wire");
+    lb->setText("Probe");
+    hL->addWidget(lb);
+    bx1Wire = new QDoubleSpinBox(topframe);
+    bx1Wire->setObjectName("bx1Wire");
+    bx1Wire->setInputMethodHints(Qt::ImhNone);
+    bx1Wire->setReadOnly(true);
+    bx1Wire->setRange(-30, 100);
+    bx1Wire->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    bx1Wire->setSuffix(" C");
+    hL->addWidget(bx1Wire);
+    hL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
+    lb = new QLabel(topframe);
+    lb->setObjectName("lb_CPUTemp");
+    lb->setText("CPU");
+    hL->addWidget(lb);
+    bxCPUTemp = new QDoubleSpinBox(topframe);
+    bxCPUTemp->setObjectName("bxCPUTemp");
+    bxCPUTemp->setInputMethodHints(Qt::ImhNone);
+    bxCPUTemp->setReadOnly(true);
+    bxCPUTemp->setRange(-30, 100);
+    bxCPUTemp->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    bxCPUTemp->setSuffix(" C");
+    hL->addWidget(bxCPUTemp);
+    hL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
+    lb = new QLabel(topframe);
+    lb->setObjectName("lb_DACTemp");
+    lb->setText("DAC");
+    hL->addWidget(lb);
+    bxDACTemp = new QDoubleSpinBox(topframe);
+    bxDACTemp->setObjectName("bxDACTemp");
+    bxDACTemp->setInputMethodHints(Qt::ImhNone);
+    bxDACTemp->setReadOnly(true);
+    bxDACTemp->setRange(-30, 100);
+    bxDACTemp->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    bxDACTemp->setSuffix(" C");
+    hL->addWidget(bxDACTemp);
+    vL->addLayout(hL);
 //      Comment about HV
     lb = new QLabel(topframe);
     lb->setObjectName("lb_HVComment");
@@ -147,10 +189,10 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
             hL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
             bxWrite[5*i + j] = new QDoubleSpinBox(topframe);
             bxWrite[5*i + j]->setObjectName(QString("Wr%1").arg(5*i + j));
-            bxWrite[5*i + j]->setMinimum(0);
-            bxWrite[5*i + j]->setMaximum(20);
+            bxWrite[5*i + j]->setMinimum(-10);
+            bxWrite[5*i + j]->setMaximum(10);
             bxWrite[5*i + j]->setSingleStep(0.1);
-            bxWrite[5*i + j]->setValue(0);
+            bxWrite[5*i + j]->setValue(-10);
             bxWrite[5*i + j]->setSuffix(" V");
             hL->addWidget(bxWrite[5*i + j]);
             bnOn[5*i + j] = new QPushButton(topframe);
@@ -236,7 +278,7 @@ void MainWindow::bxWriteChanged(double num)
     int val;
     for (i=0; i<15; i++) if (sender() == bxWrite[i]) break;
     if (i < 15) {    // check for internal error
-        val = 3276.8 * (HVset - num);
+        val = -3276.8 * num;
         if (val >= 32768) val = 32767;
         if (val < -32768) val = -32768;
         if (WriteDAC(bxAddress->value(), i, val) < 0) errorCnt++;
@@ -254,11 +296,6 @@ void MainWindow::on_bxHVWrite_valueChanged(double num)
     if (val >= 32768) val = 32767;
     if (val < -32768) val = -32768;
     if (WriteDAC(bxAddress->value(), 15, val) < 0) errorCnt++;
-    for (i=0; i<15; i++) {
-        bxWrite[i]->setMinimum(num - 10);
-        bxWrite[i]->setMaximum(num + 10);
-        bxWrite[i]->setValue(bxWrite[i]->value() + delta);
-    }
 }
 
 void MainWindow::on_bnLV_clicked(bool checked)
@@ -349,7 +386,7 @@ void MainWindow::on_bxAddress_valueChanged(int num)
             errorCnt++;
         } else {
             if (val & 0x8000) val |= 0xFFFF0000;    // extend sign
-            dval = HVset - val / 3276.8;
+            dval = -val / 3276.8;
             bxWrite[i]->setValue(dval);
         }
     }
@@ -399,6 +436,32 @@ void MainWindow::onTimer(void)
         dval = val / 65536.0 * 2.5;         // double  0..2.5
         dval *= 5 / 0.412;                  // uA: 412k and 5x
         bxIRead->setValue(dval - I0);
+    }
+//	Read DAC temperature
+    val = ReadADC(bxAddress->value(), ADC_TDAC);   // integer -32768..+32767
+    if (val < 0) {
+        errorCnt++;
+    } else {
+        dval = val / 65536.0 * 2.5;   // double  0..2.5
+        dval = 25 + (dval - 1.46)/0.0044;   // from manual : 1.46 V @ 25C and 4.4 mV/C
+        bxDACTemp->setValue(dval);
+    }
+//	Read CPU(ADC) temperature
+    val = ReadADC(bxAddress->value(), ADC_TADC);   // integer -32768..+32767
+    if (val < 0) {
+        errorCnt++;
+    } else {
+        dval = val / 65536.0 * 2.5;   // double  0..2.5
+        dval = (dval - 0.0543) / 0.000205;  // from manual : 54.3 mV @ 0C and 205 uV/C
+        bxCPUTemp->setValue(dval);
+    }
+//	Read 1Wire(probe) temperature
+    val = ReadADC(bxAddress->value(), ADC_T1W);   // integer -32768..+32767
+    if (val < 0) {
+	errorCnt++;
+    } else {
+	if (val & 0x8000) val |= 0xFFFF0000;
+	bx1Wire->setValue(val / 16.0);
     }
 //      Read DACs for individual channels
     for(i=0; i<15; i++) {
