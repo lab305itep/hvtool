@@ -4,20 +4,20 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QCommandLinkButton>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QMainWindow>
-#include <QtGui/QPushButton>
-#include <QtGui/QSpacerItem>
-#include <QtGui/QSpinBox>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCommandLinkButton>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 
 class ColorLed : public QPushButton
 {
@@ -31,8 +31,8 @@ class ColorLed : public QPushButton
         const double getRelSize(void) { return relSize; }
         const bool getRound(void) { return isRound; }
         void setColor(const QColor &cl = Qt::black) { myColor = cl;  update();}
-        const double setRelSize(const double rs = 1) { relSize = rs; update();}
-        const double SetRound(const bool rnd = false) { isRound = rnd; update();}
+        void setRelSize(const double rs = 1) { relSize = rs; update();}
+        void SetRound(const bool rnd = false) { isRound = rnd; update();}
     protected:
         virtual void paintEvent(QPaintEvent * event);
         virtual QSize sizeHint(void) { return QSize(10,10); };

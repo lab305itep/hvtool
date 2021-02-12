@@ -6,7 +6,7 @@
 */
 
 #include <stdio.h>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 #include "hv.h"
@@ -53,7 +53,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
     HVset = 10;
     
     if(objectName().isEmpty()) setObjectName(QString::fromUtf8("MainWindow"));
-    setWindowTitle(QApplication::translate("MainWindow", "HVDAC control tool (user version)", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MainWindow", "HVDAC control tool (user version)", 0));
     
     QIcon icon;
     icon.addFile("pencil_scale.png", QSize(), QIcon::Normal, QIcon::Off);

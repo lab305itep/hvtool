@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <termio.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -133,7 +134,11 @@ int hvrs_Command(int fd, unsigned char addr, unsigned char cmd, unsigned int dat
     irc = write(fd, &sbuf[1], 6);
     if (irc != 6) return -EIO;
 	// No let's read
-    irc = read(fd, rbuf, 4);
+    for(i=0; i<4; i += irc) {
+	irc = read(fd, &rbuf[i], 4-i);
+	if (irc <= 0) break;
+    }
+    irc = i;
     if (irc != 4) {
 	printf("hvrs-Get-ERR-No or bad reply from %2.2X (len=%d", addr, irc);
 	if (irc > 0) printf(", rbuf=");

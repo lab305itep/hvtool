@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 #include "hvtool.h"
@@ -44,7 +44,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
     errorCnt = 0;
     
     if(objectName().isEmpty()) setObjectName(QString::fromUtf8("MainWindow"));
-    setWindowTitle(QApplication::translate("MainWindow", "HVDAC control tool", 0, QApplication::UnicodeUTF8));
+    setWindowTitle(QApplication::translate("MainWindow", "HVDAC control tool", 0));
     
     resize(800, 300);
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -101,7 +101,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
             sizePolicy.setHeightForWidth(bnOn[i]->sizePolicy().hasHeightForWidth());
             bnOn[i]->setSizePolicy(sizePolicy);
             bnOn[i]->setCheckable(true);
-            bnOn[i]->setText(QApplication::translate("MainWindow", "On", 0, QApplication::UnicodeUTF8));
+            bnOn[i]->setText(QApplication::translate("MainWindow", "On", 0));
             hl[i]->addWidget(bnOn[i]);
 
             bxWrite[i] = new QDoubleSpinBox(topframe);
@@ -116,7 +116,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
             bnSet[i]->setObjectName(QString("bnSet%1").arg(i));
             sizePolicy.setHeightForWidth(bnSet[i]->sizePolicy().hasHeightForWidth());
             bnSet[i]->setSizePolicy(sizePolicy);
-            bnSet[i]->setText(QApplication::translate("MainWindow", "Set", 0, QApplication::UnicodeUTF8));
+            bnSet[i]->setText(QApplication::translate("MainWindow", "Set", 0));
             hl[i]->addWidget(bnSet[i]);
         }
         
@@ -136,13 +136,13 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
 
     lbLV = new QLabel(topframe);
     lbLV->setObjectName(QString::fromUtf8("lbLV"));
-    lbLV->setText(QApplication::translate("MainWindow", "Preamp power", 0, QApplication::UnicodeUTF8));
+    lbLV->setText(QApplication::translate("MainWindow", "Preamp power", 0));
     hlBottom->addWidget(lbLV);
 
     bnLV = new QPushButton(topframe);
     bnLV->setObjectName(QString::fromUtf8("bnLV"));
     bnLV->setCheckable(true);
-    bnLV->setText(QApplication::translate("MainWindow", "On", 0, QApplication::UnicodeUTF8));
+    bnLV->setText(QApplication::translate("MainWindow", "On", 0));
     hlBottom->addWidget(bnLV);
 
     hspBottom = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -150,7 +150,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
 
 	lb1WTemp = new QLabel(topframe);
     lb1WTemp->setObjectName(QString::fromUtf8("lb1WTemp"));
-    lb1WTemp->setText(QApplication::translate("MainWindow", "1Wire temperature", 0, QApplication::UnicodeUTF8));
+    lb1WTemp->setText(QApplication::translate("MainWindow", "1Wire temperature", 0));
     hlBottom->addWidget(lb1WTemp);
 
     bx1WTemp = new QDoubleSpinBox(topframe);
@@ -163,7 +163,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
 
     lbLed = new QLabel(topframe);
     lbLed->setObjectName(QString::fromUtf8("lbLed"));
-    lbLed->setText(QApplication::translate("MainWindow", "Communication error:", 0, QApplication::UnicodeUTF8));
+    lbLed->setText(QApplication::translate("MainWindow", "Communication error:", 0));
     hlBottom->addWidget(lbLed);
 
     led = new ColorLed(topframe, Qt::black, 0.8, true);
@@ -172,7 +172,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
 
     lbAddress = new QLabel(topframe);
     lbAddress->setObjectName(QString::fromUtf8("lbAddress"));
-    lbAddress->setText(QApplication::translate("MainWindow", "Unit Address", 0, QApplication::UnicodeUTF8));
+    lbAddress->setText(QApplication::translate("MainWindow", "Unit Address", 0));
     hlBottom->addWidget(lbAddress);
 
     bxAddress = new QSpinBox(topframe);
@@ -187,7 +187,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
     sizePolicy.setHeightForWidth(bnExit->sizePolicy().hasHeightForWidth());
     bnExit->setSizePolicy(sizePolicy);
     bnExit->setAutoDefault(false);
-    bnExit->setText(QApplication::translate("MainWindow", "Exit", 0, QApplication::UnicodeUTF8));
+    bnExit->setText(QApplication::translate("MainWindow", "Exit", 0));
     hlBottom->addWidget(bnExit);
 
     verticalLayout->addLayout(hlBottom);
@@ -220,7 +220,7 @@ void MainWindow::on_bnLV_clicked(bool checked)
 
 void MainWindow::on_bnLV_toggled(bool checked)
 {
-    bnLV->setText(QApplication::translate("MainWindow", (checked) ? "Off" : "On", 0, QApplication::UnicodeUTF8));
+    bnLV->setText(QApplication::translate("MainWindow", (checked) ? "Off" : "On", 0));
 }
 
 void MainWindow::bnOn_clicked(bool checked)
@@ -244,7 +244,7 @@ void MainWindow::bnOn_clicked(bool checked)
 
 void MainWindow::bnOn_toggled(bool checked)
 {
-    ((QPushButton *)sender())->setText(QApplication::translate("MainWindow", (checked) ? "Off" : "On", 0, QApplication::UnicodeUTF8));
+    ((QPushButton *)sender())->setText(QApplication::translate("MainWindow", (checked) ? "Off" : "On", 0));
 }
 
 void MainWindow::bnSet_clicked(void)
