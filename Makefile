@@ -26,5 +26,4 @@ moc_%.cpp: %.h
 
 clean :
 	rm -f *.o ui_*.h moc_*.cpp
-	rm -f hvtool
-
+	rm -f hvtool hvrstool hv hvprog hvcmd

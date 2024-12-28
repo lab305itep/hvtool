@@ -1,7 +1,25 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "cmddef.h"
 #include "hvop.h"
+
+void Usage(void)
+{
+	printf("USAGE: ./hvcmd dev addr cmd [args]\n");
+	printf("Commands:\n");
+	printf("getID - returns 64-bits thermometer chip ID\n");
+	printf("getStatus - returns board status\n");
+	printf("hvOFF - switch HV off\n");
+	printf("hvON - switch HV on\n");
+	printf("lvOFF - switch LV off\n");
+	printf("lvON - switch LV on\n");
+	printf("readADC num - read ADC value @ num\n");
+	printf("readDAC num - read DAC value @ num\n");
+	printf("setDAC num val - set DAC value @ num\n");
+	printf("switchOFF num - switch channel num off\n");
+	printf("switchON num - switch channel num on\n");
+}
 
 int main(int argc, char **argv)
 {
@@ -12,19 +30,8 @@ int main(int argc, char **argv)
 	unsigned int uval;
 
 	if (argc < 4) {
-		printf("USAGE: %s dev addr cmd [args]\n", argv[0]);
-		printf("Commands:\n");
-		printf("getID - returns 64-bits thermometer chip ID\n");
-		printf("getStatus - returns board status\n");
-		printf("hvOFF - switch HV off\n");
-		printf("hvON - switch HV on\n");
-		printf("lvOFF - switch LV off\n");
-		printf("lvON - switch LV on\n");
-		printf("readADC num - read ADC value @ num\n");
-		printf("readDAC num - read DAC value @ num\n");
-		printf("setDAC num val - set DAC value @ num\n");
-		printf("switchOFF num - switch channel num off\n");
-		printf("switchON num - switch channel num on\n");
+		printf("ERROR: not enough arguments: %d\n", argc);
+		Usage();
 		return 10;
 	}
 
@@ -44,7 +51,7 @@ int main(int argc, char **argv)
 				sprintf(&strID[4*i], "%2.2X%2.2X", val & 0xFF, (val >> 8) & 0xFF);
 			}
 		}
-		printf("ID=%s\n");
+		printf("ID=%s\n", strID);
 	} else if (!strcasecmp(argv[3], "getStatus")) {
 		uval = GetStatus(addr);
 		if (uval == 0xFFFFFFFF) goto fail;
@@ -65,13 +72,13 @@ int main(int argc, char **argv)
 		i = (argc > 4) ? strtol(argv[4], NULL, 0) : 0;
 		val = ReadADC(addr, i);
 		if (val < 0) goto fail;
-		printf("ADC[%d]=%d\n", val);
+		printf("ADC[%d]=%d\n", i, val);
 	} else if (!strcasecmp(argv[3], "readDAC")) {
 		i = (argc > 4) ? strtol(argv[4], NULL, 0) : 0;
 		val = ReadDAC(addr, i);
 		if (val < 0) goto fail;
 		if (val & 0x8000) val |= 0xFFFF0000;	// sign extension
-		printf("DAC[%d]=%d\n", val);
+		printf("DAC[%d]=%d\n", i, val);
 	} else if (!strcasecmp(argv[3], "setDAC")) {
 		i = (argc > 4) ? strtol(argv[4], NULL, 0) : 0;
 		val = (argc > 5) ? strtol(argv[5], NULL, 0) : 0;
@@ -86,6 +93,11 @@ int main(int argc, char **argv)
 		i = (argc > 4) ? strtol(argv[4], NULL, 0) : 0;
 		val = SwitchOn(addr, i);
 		if (val < 0) goto fail;
+	} else {
+		printf("UNKNOWN command %s\n", argv[3]);
+		Usage();
+		DevClose();
+		return 30;
 	}
 
 	DevClose();
