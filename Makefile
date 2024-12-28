@@ -2,9 +2,14 @@ CPPFLAGS=-I/usr/include/x86_64-linux-gnu/qt5 -fPIC
 CFLAGS=-I/usr/include/x86_64-linux-gnu/qt5 -fPIC
 LDFLAGS=-L/usr/lib/x86_64-linux-gnu/
 
-all : hvtool hvrstool hv hvprog
+all : hvtool hvrstool hv hvprog hvcmd
+
+Release: all
 
 hvprog: hvprog.o hvop.o hvrslib.o
+	gcc $^ -lm -o $@
+
+hvcmd: hvcmd.o hvop.o hvrslib.o
 	gcc $^ -lm -o $@
 
 hvrstool: hvrstool.o hvrslib.o

@@ -25,7 +25,7 @@ class ColorLed : public QPushButton
         QColor myColor;     // the LED color
         double relSize;     // LED active area relative size
         bool isRound;       // 0 - rect, 1 - ellipse
-    public: 
+    public:
         ColorLed(QWidget *parent = 0, const QColor &cl = Qt::black, const double rs = 1.0, const bool rnd = false);
         const QColor & getColor(void) { return myColor; }
         const double getRelSize(void) { return relSize; }
@@ -52,7 +52,8 @@ public:
     QPushButton *bnHV;
     QDoubleSpinBox *bxHVRead;
     QDoubleSpinBox *bxHVWrite;
-    QDoubleSpinBox *bxIRead;    
+    QDoubleSpinBox *bxIRead;
+    QLabel *bxID;
     QDoubleSpinBox *bx1Wire;
     QDoubleSpinBox *bxCPUTemp;
     QDoubleSpinBox *bxDACTemp;
@@ -61,13 +62,13 @@ public:
     QDoubleSpinBox *bxWrite[15];
     ColorLed *led;
     QSpinBox *bxAddress;
-    QPushButton *bnClear;    
-    QPushButton *bnReset;    
-    QPushButton *bnExit;    
+    QPushButton *bnClear;
+    QPushButton *bnReset;
+    QPushButton *bnExit;
     QTimer *timer;
 
     MainWindow(unsigned char addr, QWidget *parent = 0);
-    
+
 private slots:
     void on_bnLV_clicked(bool checked); // automatic...
     void on_bnLV_toggled(bool checked); // automatic...

@@ -16,7 +16,7 @@
 /************************
  *  class ColorLed      *
  ************************/
-ColorLed::ColorLed(QWidget *parent, const QColor &cl, const double rs, const bool rnd) : 
+ColorLed::ColorLed(QWidget *parent, const QColor &cl, const double rs, const bool rnd) :
     QPushButton(parent), myColor(cl), relSize(rs), isRound(rnd)
 {
     setEnabled(false);
@@ -25,7 +25,6 @@ ColorLed::ColorLed(QWidget *parent, const QColor &cl, const double rs, const boo
 void ColorLed::paintEvent(QPaintEvent * event)
 {
     int w, h;
-    
 
     QPainter painter(this);
     w = event->rect().width()  * (1 - relSize) / 2;
@@ -35,7 +34,7 @@ void ColorLed::paintEvent(QPaintEvent * event)
 
     if (isRound) {
         painter.drawEllipse(rc);
-    } else {    
+    } else {
         painter.fillRect(rc, myColor);
     }
 }
@@ -51,14 +50,14 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
     QLabel *lb;
     errorCnt = 0;
     HVset = 10;
-    
+
     if(objectName().isEmpty()) setObjectName(QString::fromUtf8("MainWindow"));
     setWindowTitle(QApplication::translate("MainWindow", "HVDAC control tool (user version)", 0));
-    
+
     QIcon icon;
     icon.addFile("pencil_scale.png", QSize(), QIcon::Normal, QIcon::Off);
     setWindowIcon(icon);
-    
+
     QWidget *topframe = new QWidget(this);
     topframe->setObjectName("topframe");
 
@@ -123,6 +122,15 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
 //	Temperatures
     hL = new QHBoxLayout();
     hL->setObjectName("hL_Temperature");
+    lb = new QLabel(topframe);
+    lb->setObjectName("lb_1WireID");
+    lb->setText("ID");
+    hL->addWidget(lb);
+    bxID = new QLabel(topframe);
+    bxID->setObjectName("bxID");
+    bxID->setText("0000000000000000");
+    hL->addWidget(bxID);
+    hL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
     lb = new QLabel(topframe);
     lb->setObjectName("lb_1WireTemp");
     lb->setText("Temperature");
@@ -212,7 +220,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
         }
         if (i) hLL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
         hLL->addLayout(hC);
-    }    
+    }
     vL->addLayout(hLL);
 //      Spacer here
     vL->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
@@ -257,7 +265,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
     vL->addLayout(hL);
 //      Starting
     setCentralWidget(topframe);
-    on_bxAddress_valueChanged(bxAddress->value());    
+    on_bxAddress_valueChanged(bxAddress->value());
     connect(bnExit, SIGNAL(clicked()), this, SLOT(close()));
     for (i=0; i<15; i++) {
         connect(bxWrite[i], SIGNAL(valueChanged(double)), this, SLOT(bxWriteChanged(double)));
@@ -265,7 +273,7 @@ MainWindow::MainWindow(unsigned char addr, QWidget *parent) : QMainWindow(parent
         connect(bnOn[i], SIGNAL(toggled(bool)), this, SLOT(bnOnToggled(bool)));
     }
     QMetaObject::connectSlotsByName(this);
-    
+
     timer = new QTimer(this);
     timer->setObjectName(QString::fromUtf8("timer"));
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
@@ -289,7 +297,7 @@ void MainWindow::on_bxHVWrite_valueChanged(double num)
 {
     int i;
     double val, delta;
-    
+
     delta = num - HVset;
     HVset = num;
     val = 3276.8 * ((num - scoef[0]) / scoef[1]);
@@ -368,7 +376,7 @@ void MainWindow::on_bxAddress_valueChanged(int num)
     rcoef[1] = 0.00002 * EEPRead(num, EE_HVCB);
     I0 = 0.7;
     errorCnt = 0;
-    
+
     val = ReadDAC(num, 15); // read HV
     if (val < 0) {
         errorCnt++;
@@ -379,7 +387,7 @@ void MainWindow::on_bxAddress_valueChanged(int num)
         bxHVWrite->setValue(dval);
         on_bxHVWrite_valueChanged(dval);
     }
-    
+
     for (i=0; i<15; i++) {  // read others
         val = ReadDAC(num, i);
         if (val < 0) {
@@ -401,6 +409,7 @@ void MainWindow::onTimer(void)
     bool b;
     QColor ldc;
     errorCnt = 0;
+    char strID[20];
 
 //      Read status
     uval = GetStatus(bxAddress->value());
@@ -408,7 +417,7 @@ void MainWindow::onTimer(void)
         b = ON_LV & uval;
         if (b != bnLV->isChecked()) bnLV->setChecked(b);
         b = ON_HV & uval;
-        if (b != bnHV->isChecked()) bnHV->setChecked(b);    
+        if (b != bnHV->isChecked()) bnHV->setChecked(b);
         for (i=0; i<15; i++) {
             b = (1 << i + 16) & uval;
             if (b != bnOn[i]->isChecked()) bnOn[i]->setChecked(b);
@@ -422,7 +431,7 @@ void MainWindow::onTimer(void)
     if (val < 0) {
         errorCnt++;
     } else {
-        dval = 0.001 * val; 
+        dval = 0.001 * val;
         // 65536.0 * 2.5;         // double  0..2.5
 //        dval *= 97.6 / 3.6;                 // HV resistor divider
         HV = rcoef[0] + dval * rcoef[1];
@@ -463,6 +472,16 @@ void MainWindow::onTimer(void)
 	if (val & 0x8000) val |= 0xFFFF0000;
 	bx1Wire->setValue(val / 16.0);
     }
+//	Read 1Wire ID
+    for (i=0; i<4; i++) {
+	val = ReadADC(bxAddress->value(), ADC_T1W + i + 1);
+	if (val < 0) {
+	    errorCnt++;
+	} else {
+	    sprintf(&strID[4*i], "%2.2X%2.2X", val & 0xFF, (val >> 8) & 0xFF);
+	}
+    }
+    bxID->setText(strID);
 //      Read DACs for individual channels
     for(i=0; i<15; i++) {
         if (bnHV->isChecked() && bnOn[i]->isChecked()) {
@@ -474,13 +493,13 @@ void MainWindow::onTimer(void)
         }
         bxRead[i]->setValue(dval);
     }
-    
+
     switch(errorCnt) {
         case 0:  ldc = Qt::darkGreen;    break;
         case 1:  ldc = Qt::yellow;       break;
         default: ldc = Qt::red;          break;
     }
-    led->setColor(ldc);    
+    led->setColor(ldc);
 }
 
 int main(int argc, char *argv[])
@@ -491,7 +510,7 @@ int main(int argc, char *argv[])
     char msg[1024];
 
     if (argc > 1 && argv[1][0] != '/') {
-        QMessageBox::critical(NULL, "HVDAC control tool", "Usage: hv <tty device> <board address>");        
+        QMessageBox::critical(NULL, "HVDAC control tool", "Usage: hv <tty device> <board address>");
         return -1;
     }
     dev = (argc > 1) ? argv[1] : (char *)"/dev/ttyS0";
